@@ -23,8 +23,7 @@ This repository implements a two-tier detection framework:
 - [Usage](#usage)
 - [Results](#results)
 - [Limitations & Future Work](#limitations--future-work)
-- [Citation](#citation)
-- [License](#license)
+
 
 ---
 
