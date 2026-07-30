@@ -266,64 +266,8 @@ On both benchmarks, the Speaker Memory Bank + cross-attention personalization co
 - Evaluated on a single benchmark with a limited number of speakers; cross-dataset generalization is untested.
 - Future directions: end-to-end joint optimization of the embedding network and memory retrieval module, learned (rather than heuristic Top-K) retrieval policies, adaptive per-speaker threshold calibration, and evaluation on multilingual / cross-dataset corpora.
 
-# 📥 Download Preprocessed Features & Models
+## 📚 Documentation
 
-The extracted acoustic features, XLS-R embeddings, and pretrained models are **not included** in this repository because they exceed GitHub's file size limitations.
+For a detailed explanation of the hybrid feature extraction pipeline, feature dimensions, preprocessing workflow, and download instructions for the precomputed features, see:
 
-All required resources can be downloaded from the Google Drive folder below:
-
-## 🔗 Google Drive
-
-**https://drive.google.com/drive/folders/1T8HzCZ8-yL4kgAFyQyiJodvOy5fsJyPg?usp=sharing**
-
-### Contents
-
-```
-Google Drive
-│
-├── In_the_Wild/
-│   ├── Train Features
-│   ├── Validation Features
-│   └── Test Features
-│
-├── ASVspoof2019/
-│   ├── Train Features
-│   ├── Development Features
-│   └── Evaluation Features
-│
-├── Pretrained Models/
-│
-└── Additional Resources/
-```
-
-
-## Directory Structure
-
-After downloading, organize the files as follows:
-
-```text
-datasets/
-│
-├── in_the_wild/
-│   ├── train/
-│   ├── validation/
-│   └── test/
-│
-└── asvspoof2019/
-    ├── train/
-    ├── development/
-    └── evaluation/
-
-models/
-│
-├── general_detector.pth
-└── personalized_detector.pth
-```
-
----
-
-## Note
-
-The repository includes the complete source code for feature extraction and model training. If you have access to the original datasets, you can regenerate all extracted features yourself by running the provided preprocessing and feature extraction scripts.
-
-Using the pre-extracted features from Google Drive is recommended to avoid lengthy preprocessing and to reproduce the reported experimental results more quickly.
+➡️ **[Hybrid Extracted Features](HYBRID_EXTRACTED_FEATURES.md)**
