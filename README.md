@@ -266,4 +266,36 @@ On both benchmarks, the Speaker Memory Bank + cross-attention personalization co
 - Evaluated on a single benchmark with a limited number of speakers; cross-dataset generalization is untested.
 - Future directions: end-to-end joint optimization of the embedding network and memory retrieval module, learned (rather than heuristic Top-K) retrieval policies, adaptive per-speaker threshold calibration, and evaluation on multilingual / cross-dataset corpora.
 
+# 📥 Download Preprocessed Features
 
+Due to GitHub's file size limitations, the extracted acoustic features, XLS-R embeddings, and trained models are hosted on Google Drive.
+
+## Google Drive
+
+📁 **Feature Files and Models**
+
+https://drive.google.com/drive/folders/1T8HzCZ8-yL4kgAFyQyiJodvOy5fsJyPg?usp=sharing
+Contents:
+
+- In-the-Wild extracted features
+- ASVspoof 2019 extracted features
+- XLS-R embeddings
+- Labels
+- Speaker metadata
+- Pretrained models
+
+After downloading, organize the files as follows:
+
+datasets/
+├── in_the_wild/
+│   ├── train/
+│   ├── validation/
+│   └── test/
+│
+└── asvspoof2019/
+    ├── train/
+    ├── development/
+    └── evaluation/
+> **Note**
+>
+> Large datasets and precomputed features are hosted externally because they exceed GitHub's storage limits. The source code for feature extraction is included in this repository, allowing users to regenerate the features if they have access to the original datasets.
