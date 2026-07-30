@@ -266,27 +266,44 @@ On both benchmarks, the Speaker Memory Bank + cross-attention personalization co
 - Evaluated on a single benchmark with a limited number of speakers; cross-dataset generalization is untested.
 - Future directions: end-to-end joint optimization of the embedding network and memory retrieval module, learned (rather than heuristic Top-K) retrieval policies, adaptive per-speaker threshold calibration, and evaluation on multilingual / cross-dataset corpora.
 
-# 📥 Download Preprocessed Features
+# 📥 Download Preprocessed Features & Models
 
-Due to GitHub's file size limitations, the extracted acoustic features, XLS-R embeddings, and trained models are hosted on Google Drive.
+The extracted acoustic features, XLS-R embeddings, and pretrained models are **not included** in this repository because they exceed GitHub's file size limitations.
 
-## Google Drive
+All required resources can be downloaded from the Google Drive folder below:
 
-📁 **Feature Files and Models**
+## 🔗 Google Drive
 
-https://drive.google.com/drive/folders/1T8HzCZ8-yL4kgAFyQyiJodvOy5fsJyPg?usp=sharing
-Contents:
+**https://drive.google.com/drive/folders/1T8HzCZ8-yL4kgAFyQyiJodvOy5fsJyPg?usp=sharing**
 
-- In-the-Wild extracted features
-- ASVspoof 2019 extracted features
-- XLS-R embeddings
-- Labels
-- Speaker metadata
-- Pretrained models
+### Contents
+
+```
+Google Drive
+│
+├── In_the_Wild/
+│   ├── Train Features
+│   ├── Validation Features
+│   └── Test Features
+│
+├── ASVspoof2019/
+│   ├── Train Features
+│   ├── Development Features
+│   └── Evaluation Features
+│
+├── Pretrained Models/
+│
+└── Additional Resources/
+```
+
+
+## Directory Structure
 
 After downloading, organize the files as follows:
 
+```text
 datasets/
+│
 ├── in_the_wild/
 │   ├── train/
 │   ├── validation/
@@ -296,6 +313,17 @@ datasets/
     ├── train/
     ├── development/
     └── evaluation/
-> **Note**
->
-> Large datasets and precomputed features are hosted externally because they exceed GitHub's storage limits. The source code for feature extraction is included in this repository, allowing users to regenerate the features if they have access to the original datasets.
+
+models/
+│
+├── general_detector.pth
+└── personalized_detector.pth
+```
+
+---
+
+## Note
+
+The repository includes the complete source code for feature extraction and model training. If you have access to the original datasets, you can regenerate all extracted features yourself by running the provided preprocessing and feature extraction scripts.
+
+Using the pre-extracted features from Google Drive is recommended to avoid lengthy preprocessing and to reproduce the reported experimental results more quickly.
