@@ -1,0 +1,24 @@
+# Dataset (download separately, see README) — never commit large data to git
+data/*
+!data/.gitkeep
+
+# Trained model checkpoints (regenerate via train.py)
+models/*.pt
+!models/.gitkeep
+
+# Generated outputs (feature caches, memory bank db, plots, submission)
+outputs/*
+!outputs/.gitkeep
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/

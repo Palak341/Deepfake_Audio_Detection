@@ -1,0 +1,119 @@
+"""
+preprocessing.py
+-----------------
+Audio loading, normalization, segmentation, and waveform-level augmentation.
+"""
+
+import librosa
+import numpy as np
+import torch
+import torchaudio
+
+from src.utils import config
+
+
+class AudioProcessor:
+    """Load -> denoise/trim -> normalize -> fixed-length segment a single
+    audio file into a mono waveform tensor ready for feature extraction."""
+
+    @staticmethod
+    def loadAudio(file_path):
+        waveform, sr = torchaudio.load(file_path)
+        if sr != config.SAMPLE_RATE:
+            waveform = torchaudio.functional.resample(waveform, sr, config.SAMPLE_RATE)
+        if waveform.shape[0] > 1:
+            waveform = waveform.mean(dim=0, keepdim=True)
+        return waveform
+
+    @staticmethod
+    def removeNoise(waveform):
+        """Optional silence removal (VAD) used as a lightweight denoise/trim step."""
+        if not config.TRIM_SILENCE:
+            return waveform
+        try:
+            result = torchaudio.functional.vad(waveform, config.SAMPLE_RATE)
+            trimmed = result[0] if isinstance(result, tuple) else result
+            return trimmed if trimmed.shape[-1] > 0 else waveform
+        except Exception:
+            return waveform
+
+    @staticmethod
+    def normalizeAudio(waveform):
+        peak = waveform.abs().max()
+        if peak > 0:
+            waveform = waveform / peak
+        return waveform
+
+    @staticmethod
+    def segmentAudio(waveform, target=None):
+        """Fixed-length segmentation: pad short clips, center-crop long ones."""
+        target = config.N_SAMPLES if target is None else target
+        n = waveform.shape[-1]
+        if n == target:
+            return waveform
+        if n < target:
+            return torch.nn.functional.pad(waveform, (0, target - n))
+        start = (n - target) // 2
+        return waveform[:, start:start + target]
+
+    @classmethod
+    def process(cls, file_path):
+        wav = cls.loadAudio(file_path)
+        wav = cls.removeNoise(wav)
+        wav = cls.normalizeAudio(wav)
+        wav = cls.segmentAudio(wav)
+        return wav
+
+
+class AudioAugmentor:
+    """Waveform-level augmentation used to oversample the minority (spoof)
+    class in the TRAIN split only. Applies 2 randomly-chosen transforms from
+    {noise, pitch-shift, time-stretch, gain} so augmented copies are diverse
+    rather than a single fixed distortion."""
+
+    @staticmethod
+    def add_noise(y, rng, snr_db_range=(10, 25)):
+        snr_db = rng.uniform(*snr_db_range)
+        sig_power = np.mean(y ** 2) + 1e-12
+        noise_power = sig_power / (10 ** (snr_db / 10))
+        noise = rng.normal(0, np.sqrt(noise_power), size=y.shape).astype(np.float32)
+        return (y + noise).astype(np.float32)
+
+    @staticmethod
+    def pitch_shift(y, rng, n_steps_range=(-2.0, 2.0)):
+        n_steps = rng.uniform(*n_steps_range)
+        return librosa.effects.pitch_shift(y, sr=config.SAMPLE_RATE, n_steps=n_steps).astype(np.float32)
+
+    @staticmethod
+    def time_stretch(y, rng, rate_range=(0.9, 1.1)):
+        rate = rng.uniform(*rate_range)
+        return librosa.effects.time_stretch(y, rate=rate).astype(np.float32)
+
+    @staticmethod
+    def gain(y, rng, gain_db_range=(-6.0, 6.0)):
+        gain_db = rng.uniform(*gain_db_range)
+        return (y * (10 ** (gain_db / 20))).astype(np.float32)
+
+    @classmethod
+    def augment(cls, y, rng):
+        ops = rng.choice(["noise", "pitch", "stretch", "gain"], size=2, replace=False)
+        for op in ops:
+            if op == "noise":
+                y = cls.add_noise(y, rng)
+            elif op == "pitch":
+                y = cls.pitch_shift(y, rng)
+            elif op == "stretch":
+                y = cls.time_stretch(y, rng)
+            elif op == "gain":
+                y = cls.gain(y, rng)
+
+        n_samples = config.N_SAMPLES
+        if len(y) < n_samples:
+            y = np.pad(y, (0, n_samples - len(y)))
+        elif len(y) > n_samples:
+            start = (len(y) - n_samples) // 2
+            y = y[start:start + n_samples]
+        peak = np.abs(y).max()
+        if peak > 0:
+            y = y / peak
+        return y.astype(np.float32)
